@@ -1,0 +1,143 @@
+%% There are macro actions in the description.
+has_any_macroaction <- macroAction(V_macroaction).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%TODO:: make a new sort maction...
+#domain macroAction(V_maction).
+exogenousAction(V_maction).
+sort_object(exogenousAction,V_maction).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#domain seqnumber(V_seqno).
+#domain inseqnumber(V_inseq).
+#domain maxseqnumber(K_star).
+#domain indexnumber(V_index).
+#domain inmacroAction(V_maction_subaction_1).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+mactionnocon(X,Z) <- noncon(X,Y) & firstactionof(Y,Z).
+mactionnocon(X,Z) <- noncon(Y,X) & firstactionof(Y,Z).
+false <- mactionnocon(X,Z) & h(eql(X,true),V_astep) & h(eql(Z,true),V_astep).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%actions in subtimestamp, default to false
+{-h(eql(V_maction_subaction_1,true),V_astep,V_seqno)}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%Inertial for inertial fluents of sub-interval of macro_actions.
+{h(V_inertialFluentAtomicFormula,V_astep,V_inseq+1)} <-
+   h(V_inertialFluentAtomicFormula,V_astep,V_inseq) &
+   V_inseq < K_star & has_any_macroaction.
+{-h(eql(V_inertialFluent,true),V_astep,V_inseq+1)} <-
+   -h(eql(V_inertialFluent,true),V_astep,V_inseq) &
+   constant_sort(V_inertialFluent,boolean) &
+   V_inseq < K_star & has_any_macroaction.
+
+{h(V_inertialFluentAtomicFormula,V_astep,1)} <-
+   h(V_inertialFluentAtomicFormula,V_astep) &
+   has_any_macroaction.
+{-h(eql(V_inertialFluent,true),V_astep,1)} <-
+   -h(eql(V_inertialFluent,true),V_astep) &
+   constant_sort(V_inertialFluent,boolean) &
+   has_any_macroaction.
+
+{h(V_inertialFluentAtomicFormula,V_astep+1)} <-
+   h(V_inertialFluentAtomicFormula,V_astep,K_star) &
+   has_any_macroaction.
+{-h(eql(V_inertialFluent,true),V_astep+1)} <-
+   -h(eql(V_inertialFluent,true),V_astep,K_star) &
+   constant_sort(V_inertialFluent,boolean) &
+   has_any_macroaction.
+
+% {h(V_inertialFluentAtomicFormula,V_astep,V_seqno+1)} <-
+%    h(V_inertialFluentAtomicFormula,V_astep,V_seqno) &
+%    has_any_macroaction.
+% % Negative version for Booleans.
+% {-h(eql(V_inertialFluent,true),V_astep,V_seqno+1)} <-
+%    -h(eql(V_inertialFluent,true),V_astep,V_seqno) &
+%    constant_sort(V_inertialFluent,boolean) &
+%    has_any_macroaction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%No concurrency of macro actions.
+false <- h(eql(V_maction,true),V_astep) & h(eql(V_maction1,true),V_astep) &
+      macroAction(V_maction1) & V_maction != V_maction1.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% exogenous fluents, nearly no occurrence.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{h(eql(V_fluent,Value),V_astep,V_inseq)} <-
+   exogenous(V_fluent) &
+   constant_object(V_fluent,Value).
+% Negative version if it's Boolean.
+{-h(eql(V_fluent,true),V_astep,V_inseq)} <-
+   exogenous(V_fluent) &
+   constant_sort(V_fluent,boolean).
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%% Inertial of fluents which are not boolean
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+{h(eql(V_fluent,Value),V_astep,V_inseq+1)} <-
+   inertial(V_fluent) &
+   h(eql(V_fluent,Value),V_astep,V_inseq) &
+   constant_object(V_fluent,Value) &
+   V_inseq < K_star & has_any_macroaction.
+% Negative version if it's Boolean.
+{-h(eql(V_fluent,true),V_astep,V_inseq+1)} <-
+   inertial(V_fluent) &
+   -h(eql(V_fluent,true),V_astep,V_inseq) &
+   constant_sort(V_fluent,boolean) &
+   V_inseq < K_star & has_any_macroaction.
+
+{h(eql(V_fluent,Value),V_astep,1)} <-
+   inertial(V_fluent) &
+   h(eql(V_fluent,Value),V_astep) &
+   constant_object(V_fluent,Value) &
+   has_any_macroaction.
+% Negative version if it's Boolean.
+{-h(eql(V_fluent,true),V_astep,1)} <-
+   inertial(V_fluent) &
+   -h(eql(V_fluent,true),V_astep) &
+   constant_sort(V_fluent,boolean) &
+   has_any_macroaction.
+
+{h(eql(V_fluent,Value),V_astep+1)} <-
+   inertial(V_fluent) &
+   h(eql(V_fluent,Value),V_astep,K_star) &
+   constant_object(V_fluent,Value) &
+   has_any_macroaction.
+% Negative version if it's Boolean.
+{-h(eql(V_fluent,true),V_astep+1)} <-
+   inertial(V_fluent) &
+   -h(eql(V_fluent,true),V_astep,K_star) &
+   constant_sort(V_fluent,boolean) &
+   has_any_macroaction.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+false <-
+   {h(V_fluentAtomicFormula,V_astep,V_inseq),
+    -h(V_fluentAtomicFormula,V_astep,V_inseq)}0.
+
+false <-
+   {h(eql(V_maction_subaction_1,true),V_astep,V_seqno),
+    -h(eql(V_maction_subaction_1,true),V_astep,V_seqno)}0.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+-h(eql(V_fluent,Object1),V_astep,V_inseq) <-
+   h(eql(V_fluent,Object),V_astep,V_inseq) &
+   constant_object(V_fluent,Object) &
+   constant_object(V_fluent,Object1) &
+   Object != Object1 &
+   not constant_sort(V_fluent,boolean).
+
+% % Actions, already in std.f2lp
+
+% -h(eql(V_action,Object1),V_astep) <-
+%    h(eql(V_action,Object),V_astep) &
+%    constant_object(V_action,Object) &
+%    constant_object(V_action,Object1) &
+%    Object != Object1 &
+%    not constant_sort(V_action,boolean).

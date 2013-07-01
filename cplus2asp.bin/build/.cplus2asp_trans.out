@@ -1,0 +1,130 @@
+% File "/home/smallqiang/Documents/HASP/cpp/Cplus2ASP/cplus2asp.bin/build/testrobot.cp".
+%%%% File testrobot.cp which has multi-layer structure.
+
+sort(location).
+#domain location(V_location).
+sort_object(location,V_location).
+sort(movableobject).
+#domain movableobject(V_movableobject).
+sort_object(movableobject,V_movableobject).
+sort(object).
+#domain object(V_object).
+sort_object(object,V_object).
+object(V_movableobject).
+sort(smallobject).
+#domain smallobject(V_smallobject).
+sort_object(smallobject,V_smallobject).
+sort(absobject).
+#domain absobject(V_absobject).
+sort_object(absobject,V_absobject).
+absobject(V_smallobject).
+movableobject(V_smallobject).
+
+movableobject(robot).
+location(l1).
+location(l2).
+location(l3).
+location(l4).
+location(l5).
+absobject(nothing).
+smallobject(box).
+smallobject(cup).
+smallobject(drink).
+smallobject(food).
+object(human).
+object(table).
+object(desk).
+object(sofa).
+
+#domain location(L).
+#domain location(L1).
+#domain absobject(A).
+#domain absobject(A1).
+#domain object(O).
+#domain smallobject(S).
+
+inertialFluent(loc(V_object)).
+constant_sort(loc(V_object),location).
+inertialFluent(hold(V_absobject)).
+constant_sort(hold(V_absobject),boolean).
+
+exogenousAction(goto(V_location)).
+constant_sort(goto(V_location),boolean).
+exogenousAction(pickup(V_smallobject)).
+constant_sort(pickup(V_smallobject),boolean).
+exogenousAction(putdown(V_smallobject)).
+constant_sort(putdown(V_smallobject),boolean).
+
+macroAction(bring(V_smallobject,V_location)).
+constant_sort(bring(V_smallobject,V_location),boolean).
+macroAction(fetch(V_smallobject,V_location)).
+constant_sort(fetch(V_smallobject,V_location),boolean).
+
+
+h(eql(loc(S),L),V_step) <- not not (h(eql(hold(S),true),V_step) & h(eql(loc(robot),L),V_step)).
+h(eql(loc(S),L),V_astep,V_seqno) <- not not (h(eql(hold(S),true),V_astep,V_seqno) & h(eql(loc(robot),L),V_astep,V_seqno)) & V_seqno != 0.
+-h(eql(hold(A),true),V_step) <- not not (h(eql(hold(A1),true),V_step) & A!=A1).
+-h(eql(hold(A),true),V_astep,V_seqno) <- not not (h(eql(hold(A1),true),V_astep,V_seqno) & A!=A1) & V_seqno != 0.
+
+h(eql(loc(robot),L),V_astep+1) <- h(eql(goto(L),true),V_astep).
+h(eql(loc(robot),L),V_astep,V_seqno+1) <- h(eql(goto(L),true),V_astep,V_seqno).
+false <- h(eql(goto(L),true),V_astep) & h(eql(loc(robot),L),V_astep).
+false <- h(eql(goto(L),true),V_astep,V_seqno) & h(eql(loc(robot),L),V_astep,V_seqno).
+
+
+h(eql(hold(S),true),V_astep+1) <- h(eql(pickup(S),true),V_astep).
+h(eql(hold(S),true),V_astep,V_seqno+1) <- h(eql(pickup(S),true),V_astep,V_seqno).
+false <- h(eql(pickup(S),true),V_astep) & -h(eql(hold(nothing),true),V_astep).
+false <- h(eql(pickup(S),true),V_astep,V_seqno) & -h(eql(hold(nothing),true),V_astep,V_seqno).
+false <- h(eql(pickup(S),true),V_astep) & not (?[V_location]:(h(eql(loc(robot),V_location),V_astep) & h(eql(loc(S),V_location),V_astep))).
+false <- h(eql(pickup(S),true),V_astep,V_seqno) & not (?[V_location]:(h(eql(loc(robot),V_location),V_astep,V_seqno) & h(eql(loc(S),V_location),V_astep,V_seqno))).
+
+h(eql(hold(nothing),true),V_astep+1) <- h(eql(putdown(S),true),V_astep).
+h(eql(hold(nothing),true),V_astep,V_seqno+1) <- h(eql(putdown(S),true),V_astep,V_seqno).
+false <- h(eql(putdown(S),true),V_astep) & -h(eql(hold(S),true),V_astep).
+false <- h(eql(putdown(S),true),V_astep,V_seqno) & -h(eql(hold(S),true),V_astep,V_seqno).
+
+noconcurrency.
+
+h(eql(pickup(S),true),V_astep,V_index) <- h(eql(bring(S,L),true),V_astep) & index(bring(S,L),pickup(S),V_index).
+h(eql(pickup(S),true),V_astep,V_seqno+V_index) <- h(eql(bring(S,L),true),V_astep,V_seqno) & index(bring(S,L),pickup(S),V_index).
+false <- h(eql(bring(S,L),true),V_astep) & h(eql(pickup(S),true),V_astep).
+inmacroAction(pickup(S)).
+firstactionof(pickup(S),bring(S,L)).
+h(eql(goto(L),true),V_astep,V_index) <- h(eql(bring(S,L),true),V_astep) & index(bring(S,L),goto(L),V_index).
+h(eql(goto(L),true),V_astep,V_seqno+V_index) <- h(eql(bring(S,L),true),V_astep,V_seqno) & index(bring(S,L),goto(L),V_index).
+false <- h(eql(bring(S,L),true),V_astep) & h(eql(goto(L),true),V_astep).
+inmacroAction(goto(L)).
+h(eql(putdown(S),true),V_astep,V_index) <- h(eql(bring(S,L),true),V_astep) & index(bring(S,L),putdown(S),V_index).
+h(eql(putdown(S),true),V_astep,V_seqno+V_index) <- h(eql(bring(S,L),true),V_astep,V_seqno) & index(bring(S,L),putdown(S),V_index).
+false <- h(eql(bring(S,L),true),V_astep) & h(eql(putdown(S),true),V_astep).
+inmacroAction(putdown(S)).
+h(eql(goto(L1),true),V_astep,V_index) <- h(eql(fetch(S,L),true),V_astep) & h(eql(loc(S),L1),V_astep,V_index) & -h(eql(loc(robot),L1),V_astep,V_index) & index(fetch(S,L),goto(L1),V_index).
+h(eql(goto(L1),true),V_astep,V_seqno+V_index) <- h(eql(fetch(S,L),true),V_astep,V_seqno) & h(eql(loc(S),L1),V_astep,V_seqno+V_index) & -h(eql(loc(robot),L1),V_astep,V_seqno+V_index) & index(fetch(S,L),goto(L1),V_index).
+false <- h(eql(fetch(S,L),true),V_astep) & h(eql(goto(L1),true),V_astep).
+inmacroAction(goto(L1)).
+firstactionof(goto(L1),fetch(S,L)).
+h(eql(bring(S,L),true),V_astep,V_index) <- h(eql(fetch(S,L),true),V_astep) & index(fetch(S,L),bring(S,L),V_index).
+h(eql(bring(S,L),true),V_astep,V_seqno+V_index) <- h(eql(fetch(S,L),true),V_astep,V_seqno) & index(fetch(S,L),bring(S,L),V_index).
+false <- h(eql(fetch(S,L),true),V_astep) & h(eql(bring(S,L),true),V_astep).
+inmacroAction(bring(S,L)).
+index(bring(S,L),pickup(S),0).
+indexnumber(0).
+index(bring(S,L),goto(L),1).
+indexnumber(1).
+index(bring(S,L),putdown(S),2).
+indexnumber(2).
+index(fetch(S,L),goto(L1),0).
+indexnumber(0).
+index(fetch(S,L),bring(S,L),1).
+indexnumber(1).
+seqnumber(0..3).
+maxseqnumber(3).
+
+query_label(query). % Selects which query to activate in a based on the value of the const "query".
+% [Query: Label:0, Maxstep:1::20]
+false <- query_label(0) & not (h(eql(loc(robot),l1),0) & h(eql(loc(human),l2),0) & h(eql(loc(table),l3),0) & h(eql(loc(desk),l4),0) & h(eql(loc(sofa),l5),0) & h(eql(loc(box),l5),0) & h(eql(loc(cup),l4),0) & h(eql(loc(food),l4),0) & h(eql(loc(drink),l3),0) & h(eql(hold(nothing),true),0)).
+false <- query_label(0) & not (h(eql(loc(food),l2),maxstep) & h(eql(loc(drink),l2),maxstep) & h(eql(loc(robot),l5),maxstep)).
+
+
+

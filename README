@@ -1,0 +1,37 @@
+Cplus2ASP System README
+-----------------------
+
+The Cplus2ASP system utilizes a tool chain of programs to translate CCalc-style action descriptions into ASP, solve the resulting ASP program, and transform the output from the ASP solver back into CCalc-style solutions.
+
+The cplus2asp program intelligently manages the following default tool chain of programs:
+  cplus2asp.bin: CCalc action description to f2lp code translator
+  f2lp: First-order ASP program to propositional ASP program translator
+  gringo: ASP grounder
+  clasp: ASP solver
+  as2transition: Transforms translated ASP output back into CCalc-style solution output
+
+This package contains statically-compiled Linux executables for cplus2asp, cplus2asp.bin, f2lp, and as2transition, along with source code and build instructions for each should you wish to compile the programs yourself.
+
+Installing the Cplus2ASP System:
+--------------------------------
+
+To install the system using the pre-compiled executables (on Linux machines), just run install.sh script as follows:
+
+sudo ./install.sh
+
+This will install all included programs into "/usr/local/bin", and any relevant support files to "/usr/local/lib".
+Alternatively, to install to a different base directory, pass the desired base directory to the script as an argument. For example to install to your local user directories "/home/me/bin" and "/home/me/lib", call the install script like so:
+
+./install.sh "/home/me"
+
+This will probably eliminate the need for you to have permissions to use the sudo program. Note that you must use an absolute path if you plan to override the default install location.
+
+In addition, you will need to download and install the programs gringo and clasp from the Potassco website: http://potassco.sourceforge.net/
+
+To get started using Cplus2ASP, check out the README file in the "src" subdirectory of the cplus2asp directory in this package for more info.
+
+Compiling the Cplus2ASP System:
+-------------------------------
+
+Each of the included programs has a "src" subdirectory that contains its source code along with a README file explaining how to compile and use the software, more information on compiling the source code can be found there.
+

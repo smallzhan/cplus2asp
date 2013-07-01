@@ -1,0 +1,152 @@
+% File "/home/smallqiang/Documents/HASP/cpp/Cplus2ASP/examples/monkey.cp".
+% File 'monkey.cp'
+% Monkey and Bananas ("Nonmonotonic Causal Theories," Figures  10-12)
+
+sort(thing).
+#domain thing(V_thing).
+sort_object(thing,V_thing).
+sort(location).
+#domain location(V_location).
+sort_object(location,V_location).
+
+thing(monkey).
+thing(bananas).
+thing(box).
+location(l1).
+location(l2).
+location(l3).
+
+#domain location(L).
+
+inertialFluent(loc(V_thing)).
+constant_sort(loc(V_thing),location).
+inertialFluent(hasBananas).
+constant_sort(hasBananas,boolean).
+inertialFluent(onBox).
+constant_sort(onBox,boolean).
+
+exogenousAction(walk(V_location)).
+constant_sort(walk(V_location),boolean).
+exogenousAction(pushBox(V_location)).
+constant_sort(pushBox(V_location),boolean).
+exogenousAction(climbOn).
+constant_sort(climbOn,boolean).
+exogenousAction(climbOff).
+constant_sort(climbOff,boolean).
+exogenousAction(graspBananas).
+constant_sort(graspBananas,boolean).
+
+h(eql(loc(bananas),L),V_step) <- not not (h(eql(hasBananas,true),V_step) & h(eql(loc(monkey),L),V_step)).
+h(eql(loc(bananas),L),V_astep,V_inseq) <- not not (h(eql(hasBananas,true),V_astep,V_inseq) & h(eql(loc(monkey),L),V_astep,V_inseq)).
+h(eql(loc(monkey),L),V_step) <- not not (h(eql(onBox,true),V_step) & h(eql(loc(box),L),V_step)).
+h(eql(loc(monkey),L),V_astep,V_inseq) <- not not (h(eql(onBox,true),V_astep,V_inseq) & h(eql(loc(box),L),V_astep,V_inseq)).
+
+h(eql(loc(monkey),L),V_astep+1) <- h(eql(walk(L),true),V_astep).
+h(eql(loc(monkey),L),V_astep,V_inseq+1) <- h(eql(walk(L),true),V_astep,V_inseq) & V_inseq < K_star.
+h(eql(loc(monkey),L),V_astep+1) <- h(eql(walk(L),true),V_astep,K_star).
+h(eql(loc(monkey),L),V_astep,1)<- h(eql(walk(L),true),V_astep,0).
+false <- h(eql(walk(L),true),V_astep) & h(eql(loc(monkey),L),V_astep).
+false <- h(eql(walk(L),true),V_astep,V_inseq) & h(eql(loc(monkey),L),V_astep,V_inseq) & V_inseq < K_star.
+false <- h(eql(walk(L),true),V_astep,K_star) & h(eql(loc(monkey),L),V_astep,K_star).
+false<- h(eql(walk(L),true),V_astep,0) & h(eql(loc(monkey),L),V_astep).
+false <- h(eql(walk(L),true),V_astep) & h(eql(onBox,true),V_astep).
+false <- h(eql(walk(L),true),V_astep,V_inseq) & h(eql(onBox,true),V_astep,V_inseq) & V_inseq < K_star.
+false <- h(eql(walk(L),true),V_astep,K_star) & h(eql(onBox,true),V_astep,K_star).
+false<- h(eql(walk(L),true),V_astep,0) & h(eql(onBox,true),V_astep).
+
+h(eql(loc(box),L),V_astep+1) <- h(eql(pushBox(L),true),V_astep).
+h(eql(loc(box),L),V_astep,V_inseq+1) <- h(eql(pushBox(L),true),V_astep,V_inseq) & V_inseq < K_star.
+h(eql(loc(box),L),V_astep+1) <- h(eql(pushBox(L),true),V_astep,K_star).
+h(eql(loc(box),L),V_astep,1)<- h(eql(pushBox(L),true),V_astep,0).
+h(eql(loc(monkey),L),V_astep+1) <- h(eql(pushBox(L),true),V_astep).
+h(eql(loc(monkey),L),V_astep,V_inseq+1) <- h(eql(pushBox(L),true),V_astep,V_inseq) & V_inseq < K_star.
+h(eql(loc(monkey),L),V_astep+1) <- h(eql(pushBox(L),true),V_astep,K_star).
+h(eql(loc(monkey),L),V_astep,1)<- h(eql(pushBox(L),true),V_astep,0).
+false <- h(eql(pushBox(L),true),V_astep) & h(eql(loc(monkey),L),V_astep).
+false <- h(eql(pushBox(L),true),V_astep,V_inseq) & h(eql(loc(monkey),L),V_astep,V_inseq) & V_inseq < K_star.
+false <- h(eql(pushBox(L),true),V_astep,K_star) & h(eql(loc(monkey),L),V_astep,K_star).
+false<- h(eql(pushBox(L),true),V_astep,0) & h(eql(loc(monkey),L),V_astep).
+false <- h(eql(pushBox(L),true),V_astep) & h(eql(onBox,true),V_astep).
+false <- h(eql(pushBox(L),true),V_astep,V_inseq) & h(eql(onBox,true),V_astep,V_inseq) & V_inseq < K_star.
+false <- h(eql(pushBox(L),true),V_astep,K_star) & h(eql(onBox,true),V_astep,K_star).
+false<- h(eql(pushBox(L),true),V_astep,0) & h(eql(onBox,true),V_astep).
+false <- h(eql(pushBox(L),true),V_astep) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep) & h(eql(loc(box),V_location),V_astep))).
+false <- h(eql(pushBox(L),true),V_astep,V_inseq) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep,V_inseq) & h(eql(loc(box),V_location),V_astep,V_inseq))) & V_inseq < K_star.
+false <- h(eql(pushBox(L),true),V_astep,K_star) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep,K_star) & h(eql(loc(box),V_location),V_astep,K_star))).
+false<- h(eql(pushBox(L),true),V_astep,0) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep) & h(eql(loc(box),V_location),V_astep))).
+
+h(eql(onBox,true),V_astep+1) <- h(eql(climbOn,true),V_astep).
+h(eql(onBox,true),V_astep,V_inseq+1) <- h(eql(climbOn,true),V_astep,V_inseq) & V_inseq < K_star.
+h(eql(onBox,true),V_astep+1) <- h(eql(climbOn,true),V_astep,K_star).
+h(eql(onBox,true),V_astep,1)<- h(eql(climbOn,true),V_astep,0).
+false <- h(eql(climbOn,true),V_astep) & h(eql(onBox,true),V_astep).
+false <- h(eql(climbOn,true),V_astep,V_inseq) & h(eql(onBox,true),V_astep,V_inseq) & V_inseq < K_star.
+false <- h(eql(climbOn,true),V_astep,K_star) & h(eql(onBox,true),V_astep,K_star).
+false<- h(eql(climbOn,true),V_astep,0) & h(eql(onBox,true),V_astep).
+false <- h(eql(climbOn,true),V_astep) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep) & h(eql(loc(box),V_location),V_astep))).
+false <- h(eql(climbOn,true),V_astep,V_inseq) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep,V_inseq) & h(eql(loc(box),V_location),V_astep,V_inseq))) & V_inseq < K_star.
+false <- h(eql(climbOn,true),V_astep,K_star) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep,K_star) & h(eql(loc(box),V_location),V_astep,K_star))).
+false<- h(eql(climbOn,true),V_astep,0) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep) & h(eql(loc(box),V_location),V_astep))).
+
+-h(eql(onBox,true),V_astep+1) <- h(eql(climbOff,true),V_astep).
+-h(eql(onBox,true),V_astep,V_inseq+1) <- h(eql(climbOff,true),V_astep,V_inseq) & V_inseq < K_star.
+-h(eql(onBox,true),V_astep+1) <- h(eql(climbOff,true),V_astep,K_star).
+-h(eql(onBox,true),V_astep,1)<- h(eql(climbOff,true),V_astep,0).
+false <- h(eql(climbOff,true),V_astep) & -h(eql(onBox,true),V_astep).
+false <- h(eql(climbOff,true),V_astep,V_inseq) & -h(eql(onBox,true),V_astep,V_inseq) & V_inseq < K_star.
+false <- h(eql(climbOff,true),V_astep,K_star) & -h(eql(onBox,true),V_astep,K_star).
+false<- h(eql(climbOff,true),V_astep,0) & -h(eql(onBox,true),V_astep).
+
+h(eql(hasBananas,true),V_astep+1) <- h(eql(graspBananas,true),V_astep).
+h(eql(hasBananas,true),V_astep,V_inseq+1) <- h(eql(graspBananas,true),V_astep,V_inseq) & V_inseq < K_star.
+h(eql(hasBananas,true),V_astep+1) <- h(eql(graspBananas,true),V_astep,K_star).
+h(eql(hasBananas,true),V_astep,1)<- h(eql(graspBananas,true),V_astep,0).
+false <- h(eql(graspBananas,true),V_astep) & h(eql(hasBananas,true),V_astep).
+false <- h(eql(graspBananas,true),V_astep,V_inseq) & h(eql(hasBananas,true),V_astep,V_inseq) & V_inseq < K_star.
+false <- h(eql(graspBananas,true),V_astep,K_star) & h(eql(hasBananas,true),V_astep,K_star).
+false<- h(eql(graspBananas,true),V_astep,0) & h(eql(hasBananas,true),V_astep).
+false <- h(eql(graspBananas,true),V_astep) & -h(eql(onBox,true),V_astep).
+false <- h(eql(graspBananas,true),V_astep,V_inseq) & -h(eql(onBox,true),V_astep,V_inseq) & V_inseq < K_star.
+false <- h(eql(graspBananas,true),V_astep,K_star) & -h(eql(onBox,true),V_astep,K_star).
+false<- h(eql(graspBananas,true),V_astep,0) & -h(eql(onBox,true),V_astep).
+false <- h(eql(graspBananas,true),V_astep) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep) & h(eql(loc(bananas),V_location),V_astep))).
+false <- h(eql(graspBananas,true),V_astep,V_inseq) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep,V_inseq) & h(eql(loc(bananas),V_location),V_astep,V_inseq))) & V_inseq < K_star.
+false <- h(eql(graspBananas,true),V_astep,K_star) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep,K_star) & h(eql(loc(bananas),V_location),V_astep,K_star))).
+false<- h(eql(graspBananas,true),V_astep,0) & not (?[V_location]:(h(eql(loc(monkey),V_location),V_astep) & h(eql(loc(bananas),V_location),V_astep))).
+
+false <- h(eql(walk(L),true),V_astep) & h(eql(pushBox(L),true),V_astep).
+noncon(walk(L),pushBox(L)).
+noconof(walk(L)).noconof(pushBox(L)).
+false <- h(eql(walk(L),true),V_astep) & h(eql(climbOn,true),V_astep).
+noncon(walk(L),climbOn).
+noconof(walk(L)).noconof(climbOn).
+false <- h(eql(pushBox(L),true),V_astep) & h(eql(climbOn,true),V_astep).
+noncon(pushBox(L),climbOn).
+noconof(pushBox(L)).noconof(climbOn).
+false <- h(eql(climbOff,true),V_astep) & h(eql(graspBananas,true),V_astep).
+noncon(climbOff,graspBananas).
+noconof(climbOff).noconof(graspBananas).
+
+
+% Prediction
+query_label(query). % Selects which query to activate in a based on the value of the const "query".
+% [Query: Label:0, Maxstep:2]
+false <- query_label(0) & not (h(eql(loc(monkey),l1),0) & h(eql(loc(bananas),l2),0) & h(eql(loc(box),l3),0) & h(eql(walk(l3),true),0)).
+false <- query_label(0) & not (h(eql(pushBox(l2),true),1)).
+false <- query_label(0) & not (not (?[V_location]:(h(eql(loc(monkey),V_location),2) & h(eql(loc(bananas),V_location),2))) | not (?[V_location]:(h(eql(loc(bananas),V_location),2) & h(eql(loc(box),V_location),2)))).
+
+% Postdiction
+% [Query: Label:1, Maxstep:2]
+false <- query_label(1) & not (h(eql(walk(l3),true),0)).
+false <- query_label(1) & not (?[L]:(h(eql(pushBox(L),true),1))).
+false <- query_label(1) & not (-h(eql(loc(box),l3),0)).
+
+% Planning
+% [Query: Label:2, Maxstep:1::100]
+false <- query_label(2) & not (h(eql(loc(monkey),l1),0) & h(eql(loc(bananas),l2),0) & h(eql(loc(box),l3),0)).
+false <- query_label(2) & not (h(eql(hasBananas,true),maxstep)).
+
+% Planning
+% [Query: Label:3, Maxstep:4]
+false <- query_label(3) & not (h(eql(loc(monkey),l1),0) & h(eql(loc(bananas),l2),0) & h(eql(loc(box),l3),0)).
+false <- query_label(3) & not (h(eql(hasBananas,true),maxstep)).
